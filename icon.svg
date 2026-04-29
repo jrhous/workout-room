@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0a0a0a"/>
+
+  <!-- Hazard stripes — top band -->
+  <clipPath id="top-band"><rect width="512" height="56"/></clipPath>
+  <g clip-path="url(#top-band)">
+    <g fill="#e10600">
+      <polygon points="-28,0 -14,0 42,56 28,56"/>
+      <polygon points="0,0 14,0 70,56 56,56"/>
+      <polygon points="28,0 42,0 98,56 84,56"/>
+      <polygon points="56,0 70,0 126,56 112,56"/>
+      <polygon points="84,0 98,0 154,56 140,56"/>
+      <polygon points="112,0 126,0 182,56 168,56"/>
+      <polygon points="140,0 154,0 210,56 196,56"/>
+      <polygon points="168,0 182,0 238,56 224,56"/>
+      <polygon points="196,0 210,0 266,56 252,56"/>
+      <polygon points="224,0 238,0 294,56 280,56"/>
+      <polygon points="252,0 266,0 322,56 308,56"/>
+      <polygon points="280,0 294,0 350,56 336,56"/>
+      <polygon points="308,0 322,0 378,56 364,56"/>
+      <polygon points="336,0 350,0 406,56 392,56"/>
+      <polygon points="364,0 378,0 434,56 420,56"/>
+      <polygon points="392,0 406,0 462,56 448,56"/>
+      <polygon points="420,0 434,0 490,56 476,56"/>
+      <polygon points="448,0 462,0 518,56 504,56"/>
+    </g>
+  </g>
+
+  <!-- "IR" text -->
+  <text x="256" y="365"
+        font-family="'Arial Black', Arial, sans-serif"
+        font-weight="900"
+        font-size="252"
+        fill="#f4f1ea"
+        text-anchor="middle"
+        dominant-baseline="auto">IR</text>
+
+  <!-- Red rule -->
+  <rect x="52" y="378" width="408" height="8" fill="#e10600"/>
+
+  <!-- Subtext -->
+  <text x="256" y="432"
+        font-family="Arial, sans-serif"
+        font-weight="700"
+        font-size="44"
+        fill="#e10600"
+        text-anchor="middle"
+        dominant-baseline="auto">THE IRON ROOM</text>
+
+  <!-- Bottom red bar -->
+  <rect y="494" width="512" height="18" fill="#e10600"/>
+</svg>

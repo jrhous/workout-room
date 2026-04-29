@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1024, initial-scale=1, viewport-fit=cover" />
+
+  <!-- PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Iron Room" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" id="apple-icon" href="icon.svg" />
+
+  <link rel="stylesheet" href="Prototypes/app/styles.css" />
+  <title>The Iron Room</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="workouts.js"></script>
+  <script src="store.js"></script>
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="screens.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+
+  <script>
+    // Generate apple-touch-icon via canvas so iOS gets a proper PNG icon
+    (function () {
+      const sz = 512;
+      const c = document.createElement('canvas');
+      c.width = c.height = sz;
+      const ctx = c.getContext('2d');
+
+      // Background
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, sz, sz);
+
+      // Hazard stripes — top band
+      const stripe = 14, gap = 14, band = 56;
+      for (let x = -band; x < sz + band; x += stripe + gap) {
+        ctx.fillStyle = '#e10600';
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x + stripe, 0);
+        ctx.lineTo(x + stripe + band, band);
+        ctx.lineTo(x + band, band);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // "IR" — main display text
+      ctx.fillStyle = '#f4f1ea';
+      ctx.font = '700 260px Arial Black, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('IR', sz / 2, 360);
+
+      // Red rule
+      ctx.fillStyle = '#e10600';
+      ctx.fillRect(sz * 0.1, 382, sz * 0.8, 8);
+
+      // Subtext
+      ctx.fillStyle = '#e10600';
+      ctx.font = '700 52px Arial';
+      ctx.textBaseline = 'top';
+      ctx.fillText('THE IRON ROOM', sz / 2, 404);
+
+      // Bottom red bar
+      ctx.fillStyle = '#e10600';
+      ctx.fillRect(0, sz - 18, sz, 18);
+
+      const dataUrl = c.toDataURL('image/png');
+      document.getElementById('apple-icon').href = dataUrl;
+    })();
+
+    // Auto-fit to viewport on smaller-than-1024 screens
+    function fit() {
+      const app = document.querySelector('.app');
+      if (!app) { requestAnimationFrame(fit); return; }
+      const stage = document.querySelector('.stage');
+      if (!stage) return;
+      const sx = stage.clientWidth / 1024;
+      const sy = stage.clientHeight / 1366;
+      const s = Math.min(1, sx, sy);
+      app.style.transform = `scale(${s})`;
+      app.style.transformOrigin = 'top center';
+    }
+    window.addEventListener('resize', fit);
+    setTimeout(fit, 50);
+    setTimeout(fit, 500);
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

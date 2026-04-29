@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>The Iron Room — Workout Room</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  body { background: #0a0a0a; min-height: 100vh; display: flex; flex-direction: column; }
+  .top { height: 14px; }
+  .wrap {
+    flex: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 56px 48px 48px;
+    display: flex; flex-direction: column; gap: 36px;
+  }
+  .head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 24px; padding-bottom: 22px; border-bottom: 6px solid var(--blood); }
+  .head .kicker { color: var(--blood); font-family: 'Barlow Condensed'; font-weight: 800; letter-spacing: 0.32em; font-size: 16px; }
+  .head h1 { margin: 6px 0 0; font-family: 'Anton'; font-size: 110px; line-height: 0.86; letter-spacing: 0.005em; }
+  .head h1 .red { color: var(--blood); }
+  .head .meta { text-align: right; }
+  .head .stamp { transform: rotate(-3deg); font-size: 22px; }
+  .head .meta .sub { display: block; margin-top: 12px; font-family: 'Barlow Condensed'; font-weight: 700; letter-spacing: 0.22em; font-size: 14px; opacity: 0.7; }
+
+  .grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 22px; }
+  .card {
+    background: var(--ink-2); border: 2px solid #1f1f1f;
+    padding: 28px; display: flex; flex-direction: column; gap: 14px;
+    text-decoration: none; color: var(--bone);
+    position: relative; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    min-height: 360px;
+  }
+  .card:hover { border-color: var(--blood); transform: translateY(-4px); box-shadow: 0 14px 40px rgba(225,6,0,0.25); }
+  .card .num { font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 0.28em; color: var(--blood); }
+  .card .ttl { font-family: 'Anton'; font-size: 56px; line-height: 0.88; }
+  .card .ttl .red { color: var(--blood); }
+  .card .desc { font-family: 'Barlow Condensed'; font-weight: 600; letter-spacing: 0.06em; font-size: 16px; opacity: 0.78; flex: 1; }
+  .card .meta { display: flex; gap: 8px; align-items: center; font-family: 'Barlow Condensed'; font-weight: 800; letter-spacing: 0.18em; font-size: 12px; }
+  .card .meta .pill { background: var(--blood); color: var(--bone); padding: 3px 8px; }
+  .card .arrow {
+    position: absolute; bottom: 22px; right: 22px;
+    font-family: 'Anton'; font-size: 38px; color: var(--blood);
+  }
+  .card.poster { grid-row: span 1; }
+  .card.poster .ttl { font-size: 84px; }
+
+  .preview { aspect-ratio: 4/3; background: #000; border: 1px dashed var(--rule-strong); position: relative; overflow: hidden; }
+  .preview .stripe { position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, var(--blood) 0 6px, #0a0a0a 6px 12px); opacity: 0.18; }
+  .preview .label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: 'Anton'; font-size: 38px; color: var(--bone);
+  }
+
+  .bottom-band {
+    background: var(--blood); color: var(--ink); padding: 20px 32px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px;
+  }
+  .bottom-band .big { font-family: 'Anton'; font-size: 38px; line-height: 0.9; }
+  .bottom-band .small { font-family: 'Barlow Condensed'; font-weight: 800; letter-spacing: 0.24em; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="top hazard-thin"></div>
+  <main class="wrap" data-screen-label="Index">
+    <header class="head">
+      <div>
+        <div class="kicker">▌ THE IRON ROOM · WORKOUT ROOM</div>
+        <h1>READY <span class="red">/</span> SET <span class="red">/</span> LIFT</h1>
+      </div>
+      <div class="meta">
+        <span class="stamp">DO WORK</span>
+        <span class="sub">PRINT-READY · BLACK &amp; RED</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <a class="card poster" href="Daily Workout Poster.html">
+        <div class="num">FILE 01 · 24"×36" PORTRAIT</div>
+        <div class="ttl">DAILY<br/><span class="red">PROTOCOL</span> POSTER</div>
+        <div class="preview"><div class="stripe"></div><div class="label">WALL REFERENCE</div></div>
+        <div class="desc">Big-format wall poster with all six days at a glance — for the equipment room.</div>
+        <div class="meta"><span class="pill">POSTER</span><span>SIX DAYS · ONE PAGE</span></div>
+        <span class="arrow">→</span>
+      </a>
+
+      <a class="card" href="Christian Tracker.html">
+        <div class="num">FILE 02 · A4 LANDSCAPE · 7 PG</div>
+        <div class="ttl">CHRISTIAN<br/><span class="red">TRACKER</span></div>
+        <div class="preview"><div class="stripe"></div><div class="label">FILL DAILY</div></div>
+        <div class="desc">Six-week log: starting stats, weekly check-ins, every set every day.</div>
+        <div class="meta"><span class="pill">TRACKER</span><span>PRINT &amp; FILL</span></div>
+        <span class="arrow">→</span>
+      </a>
+
+      <a class="card" href="Johnny Tracker.html">
+        <div class="num">FILE 03 · A4 LANDSCAPE · 7 PG</div>
+        <div class="ttl">JOHNNY<br/><span class="red">TRACKER</span></div>
+        <div class="preview"><div class="stripe"></div><div class="label">FILL DAILY</div></div>
+        <div class="desc">Same protocol, separate logbook. One per body, one per week.</div>
+        <div class="meta"><span class="pill">TRACKER</span><span>PRINT &amp; FILL</span></div>
+        <span class="arrow">→</span>
+      </a>
+    </section>
+
+    <div class="bottom-band">
+      <span class="small">PROTOCOL</span>
+      <span class="big">SHOW UP. SUIT UP. LIFT. <span style="opacity:0.55">·</span> SIX WEEKS · ZERO QUIT</span>
+      <span class="small">EARN IT</span>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Daily Workout — Iron Room Poster</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* 24" x 36" portrait poster @ 96dpi = 2304 x 3456 ish.
+     We design at a fixed canvas and let the host scale. */
+  body { background: #2a2a2a; display: flex; justify-content: center; padding: 24px; }
+  .poster {
+    width: 1728px;   /* 18in @ 96dpi */
+    height: 2592px;  /* 27in @ 96dpi — 2:3 portrait */
+    background: var(--ink);
+    color: var(--bone);
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    overflow: hidden;
+    padding: 70px 80px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top hazard stripe */
+  .top-stripe { position: absolute; top: 0; left: 0; right: 0; height: 28px; }
+  .bot-stripe { position: absolute; bottom: 0; left: 0; right: 0; height: 28px; }
+
+  /* Big diagonal background "WORK" word */
+  .ghost {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ghost-word {
+    position: absolute;
+    font-family: 'Anton', sans-serif;
+    font-size: 1400px;
+    line-height: 1;
+    color: rgba(225,6,0,0.05);
+    transform: rotate(-12deg);
+    top: -100px;
+    left: -200px;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  /* Header */
+  .header { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 30px; margin-top: 30px; padding-bottom: 22px; border-bottom: 6px solid var(--blood); }
+  .header .left .kicker { color: var(--blood); font-family: 'Barlow Condensed'; font-weight: 800; letter-spacing: 0.32em; font-size: 22px; }
+  .header .left .id { color: var(--bone); opacity: 0.5; font-family: 'JetBrains Mono'; font-size: 14px; margin-top: 8px; letter-spacing: 0.18em; }
+  .header h1 { margin: 0; font-family: 'Anton', sans-serif; font-size: 220px; line-height: 0.86; text-align: center; letter-spacing: 0.005em; }
+  .header h1 .red { color: var(--blood); }
+  .header .right { text-align: right; }
+  .header .right .stamp { transform: rotate(3deg); font-size: 26px; }
+  .header .right .sub { display: block; margin-top: 14px; color: var(--bone); opacity: 0.7; font-family: 'Barlow Condensed'; letter-spacing: 0.18em; font-size: 18px; font-weight: 600; }
+
+  .subhead {
+    margin-top: 18px; display: flex; justify-content: space-between; align-items: center;
+    color: var(--bone); font-family: 'Barlow Condensed'; font-weight: 700; letter-spacing: 0.4em; font-size: 18px;
+  }
+  .subhead .pipe { color: var(--blood); }
+
+  /* The 6-day grid: 3 columns x 2 rows */
+  .grid {
+    margin-top: 36px;
+    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 28px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .card {
+    background: linear-gradient(180deg, var(--ink-2) 0%, var(--ink) 100%);
+    border: 2px solid #2a2a2a;
+    padding: 22px 24px 24px;
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .card.hero {
+    border-color: var(--blood);
+    box-shadow: inset 0 0 0 1px rgba(225,6,0,0.25), 0 0 0 4px #0a0a0a, 0 0 0 6px var(--blood-deep);
+  }
+
+  .card .corner {
+    position: absolute; top: -2px; right: -2px; width: 56px; height: 56px;
+    background: var(--blood); color: var(--bone);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Anton'; font-size: 30px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    padding-left: 28px; padding-bottom: 14px;
+  }
+
+  .card .day {
+    display: flex; align-items: baseline; gap: 14px;
+    border-bottom: 2px dashed var(--rule-strong); padding-bottom: 12px; margin-bottom: 14px;
+  }
+  .card .day .num {
+    font-family: 'Anton'; font-size: 78px; line-height: 0.85; color: var(--blood);
+  }
+  .card .day .name {
+    font-family: 'Anton'; font-size: 44px; line-height: 0.95; letter-spacing: 0.02em; color: var(--bone);
+  }
+  .card .day .name small {
+    display: block; font-family: 'Barlow Condensed'; font-weight: 700; font-size: 16px; letter-spacing: 0.32em; color: var(--blood); margin-top: 6px;
+  }
+
+  .card .focus {
+    font-family: 'Barlow Condensed'; font-weight: 800; letter-spacing: 0.18em; font-size: 16px;
+    color: var(--bone); opacity: 0.7; text-transform: uppercase; margin-bottom: 10px;
+  }
+
+  .ex-list { list-style: none; padding: 0; margin: 0; flex: 1; }
+  .ex-list li {
+    display: grid; grid-template-columns: 1fr auto;
+    align-items: baseline; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--rule);
+  }
+  .ex-list li:last-child { border-bottom: none; }
+  .ex-list .ex {
+    font-family: 'Barlow Condensed'; font-weight: 700; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--bone);
+  }
+  .ex-list .sets {
+    font-family: 'JetBrains Mono'; font-weight: 700; font-size: 16px; color: var(--blood);
+    letter-spacing: 0.04em; white-space: nowrap;
+  }
+
+  /* HIIT / steady cardio cards have a different rhythm */
+  .card.cardio .ex-list .ex { font-size: 20px; }
+  .card.cardio .ex-list .sets { font-size: 14px; }
+
+  .card .footnote {
+    margin-top: 14px; padding-top: 10px; border-top: 2px solid var(--blood);
+    font-family: 'Barlow Condensed'; font-weight: 700; font-size: 15px; letter-spacing: 0.16em;
+    color: var(--bone); opacity: 0.85; text-transform: uppercase;
+    display: flex; justify-content: space-between;
+  }
+  .card .footnote .tag { background: transparent; color: var(--blood); padding: 0; font-weight: 800; }
+
+  /* Sunday rest tile */
+  .rest {
+    grid-column: span 1;
+    background: var(--blood);
+    color: var(--ink);
+    padding: 22px 24px;
+    display: none; /* hidden — we have 6 cards filling the grid */
+  }
+
+  /* Bottom commandments band */
+  .commandments {
+    border-top: 6px solid var(--blood); padding-top: 22px;
+    display: grid; grid-template-columns: auto 1fr auto; gap: 30px; align-items: center;
+    flex-shrink: 0;
+  }
+  .commandments .creed {
+    font-family: 'Anton'; font-size: 64px; line-height: 0.92; color: var(--bone);
+  }
+  .commandments .creed .red { color: var(--blood); }
+  .commandments .rules {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px;
+    font-family: 'Barlow Condensed'; font-weight: 700; font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bone); opacity: 0.85;
+  }
+  .commandments .rules span { display: flex; gap: 8px; }
+  .commandments .rules span::before { content: "■"; color: var(--blood); }
+  .commandments .stamp-final {
+    border: 4px solid var(--blood); color: var(--blood);
+    padding: 14px 18px;
+    font-family: 'Anton'; font-size: 38px; letter-spacing: 0.06em;
+    transform: rotate(-4deg);
+    text-align: center; line-height: 0.95;
+  }
+  .commandments .stamp-final small { display: block; font-family: 'Barlow Condensed'; font-size: 12px; letter-spacing: 0.3em; font-weight: 700; margin-top: 4px; }
+
+  /* registration marks */
+  .reg { position: absolute; width: 22px; height: 22px; border: 2px solid var(--bone); opacity: 0.4; }
+  .reg.tl { top: 30px; left: 30px; }
+  .reg.tr { top: 30px; right: 30px; }
+  .reg.bl { bottom: 30px; left: 30px; }
+  .reg.br { bottom: 30px; right: 30px; }
+
+  @media print {
+    @page { size: 24in 36in; margin: 0; }
+    body { background: #000; padding: 0; display: block; }
+    .poster { width: 24in; height: 36in; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="poster grain" data-screen-label="Daily Workout Poster">
+    <!-- registration marks -->
+    <div class="reg tl"></div>
+    <div class="reg tr"></div>
+    <div class="reg bl"></div>
+    <div class="reg br"></div>
+
+    <!-- top hazard -->
+    <div class="top-stripe hazard-thin"></div>
+
+    <!-- ghost word -->
+    <div class="ghost"><div class="ghost-word">WORK</div></div>
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="left">
+        <div class="kicker">▌ THE IRON ROOM</div>
+        <div class="id">FILE: 6-DAY-SPLIT // REV.01 // EST. 2026</div>
+      </div>
+      <h1>DAILY<br /><span class="red">PROTOCOL</span></h1>
+      <div class="right">
+        <span class="stamp">NO EXCUSES</span>
+        <span class="sub">SHOW UP. SUIT UP. LIFT.</span>
+      </div>
+    </header>
+
+    <div class="subhead">
+      <span>SIX DAYS <span class="pipe">/</span> ONE BODY <span class="pipe">/</span> ZERO QUIT</span>
+      <span class="mono" style="font-size:14px; opacity:0.6; letter-spacing:0.18em;">REPS × SETS · POSTED FOR REFERENCE</span>
+    </div>
+
+    <!-- 6 DAYS GRID -->
+    <main class="grid">
+
+      <!-- MONDAY -->
+      <section class="card hero">
+        <div class="corner">M</div>
+        <div class="day">
+          <div class="num">01</div>
+          <div class="name">PUSH<small>MON · CHEST · SHOULDERS · TRI</small></div>
+        </div>
+        <div class="focus">Heavy + Hypertrophy</div>
+        <ul class="ex-list">
+          <li><span class="ex">Bench Press</span><span class="sets">4 × 8</span></li>
+          <li><span class="ex">Incline DB Press</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Shoulder Press</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Cable Flyes</span><span class="sets">3 × 12</span></li>
+          <li><span class="ex">Tricep Pushdowns</span><span class="sets">3 × 12</span></li>
+          <li><span class="ex">Lateral Raises</span><span class="sets">3 × 15</span></li>
+        </ul>
+        <div class="footnote"><span>Compound first.</span><span class="tag">PUSH 'TIL YOU CAN'T</span></div>
+      </section>
+
+      <!-- TUESDAY -->
+      <section class="card cardio">
+        <div class="corner">T</div>
+        <div class="day">
+          <div class="num">02</div>
+          <div class="name">HIIT<small>TUE · TREADMILL · ~25 MIN</small></div>
+        </div>
+        <div class="focus">Sprint Intervals</div>
+        <ul class="ex-list">
+          <li><span class="ex">Warmup Walk</span><span class="sets">5 MIN</span></li>
+          <li><span class="ex">Sprint Intervals</span><span class="sets">8 × 30s/90s</span></li>
+          <li><span class="ex">Cooldown Walk</span><span class="sets">5 MIN</span></li>
+        </ul>
+        <div style="flex:1;"></div>
+        <div style="background:#0a0a0a; border:1px dashed var(--rule-strong); padding:10px 12px; margin-top:8px;">
+          <div class="cond" style="font-size:13px; letter-spacing:0.22em; color:var(--blood); font-weight:800;">PROTOCOL</div>
+          <div class="cond" style="font-size:18px; color:var(--bone); margin-top:4px; line-height:1.15;">30s ALL-OUT SPRINT · 90s WALK · REPEAT 8×</div>
+        </div>
+        <div class="footnote"><span>Lungs &gt; Legs.</span><span class="tag">EMPTY THE TANK</span></div>
+      </section>
+
+      <!-- WEDNESDAY -->
+      <section class="card">
+        <div class="corner">W</div>
+        <div class="day">
+          <div class="num">03</div>
+          <div class="name">PULL<small>WED · BACK · BICEPS</small></div>
+        </div>
+        <div class="focus">Width + Thickness</div>
+        <ul class="ex-list">
+          <li><span class="ex">Lat Pulldown</span><span class="sets">4 × 8</span></li>
+          <li><span class="ex">Seated Row</span><span class="sets">4 × 10</span></li>
+          <li><span class="ex">Single-Arm Row</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Face Pulls</span><span class="sets">3 × 15</span></li>
+          <li><span class="ex">Bicep Curls</span><span class="sets">3 × 12</span></li>
+          <li><span class="ex">Hammer Curls</span><span class="sets">3 × 12</span></li>
+        </ul>
+        <div class="footnote"><span>Squeeze every rep.</span><span class="tag">BUILD THE BACK</span></div>
+      </section>
+
+      <!-- THURSDAY -->
+      <section class="card cardio">
+        <div class="corner">T</div>
+        <div class="day">
+          <div class="num">04</div>
+          <div class="name">STEADY<small>THU · INCLINE WALK · 35–45 MIN</small></div>
+        </div>
+        <div class="focus">Recovery Cardio</div>
+        <ul class="ex-list">
+          <li><span class="ex">Incline Walk</span><span class="sets">3.5 MPH</span></li>
+          <li><span class="ex">Incline</span><span class="sets">8–10%</span></li>
+          <li><span class="ex">Duration</span><span class="sets">35–45 MIN</span></li>
+        </ul>
+        <div style="flex:1;"></div>
+        <div style="background:#0a0a0a; border:1px dashed var(--rule-strong); padding:10px 12px; margin-top:8px;">
+          <div class="cond" style="font-size:13px; letter-spacing:0.22em; color:var(--blood); font-weight:800;">RULE</div>
+          <div class="cond" style="font-size:18px; color:var(--bone); margin-top:4px; line-height:1.15;">NOSE BREATHING · CONVERSATIONAL PACE</div>
+        </div>
+        <div class="footnote"><span>Steady wins.</span><span class="tag">SHOW UP ANYWAY</span></div>
+      </section>
+
+      <!-- FRIDAY -->
+      <section class="card hero">
+        <div class="corner">F</div>
+        <div class="day">
+          <div class="num">05</div>
+          <div class="name">LEGS<small>FRI · LOWER BODY · CORE</small></div>
+        </div>
+        <div class="focus">No Skipping. Ever.</div>
+        <ul class="ex-list">
+          <li><span class="ex">Goblet/DB Squats</span><span class="sets">4 × 10</span></li>
+          <li><span class="ex">Romanian Deadlifts</span><span class="sets">4 × 10</span></li>
+          <li><span class="ex">Leg Press / Split Squats</span><span class="sets">3 × 12</span></li>
+          <li><span class="ex">Calf Raises</span><span class="sets">4 × 15</span></li>
+          <li><span class="ex">Hanging Leg Raises</span><span class="sets">3 × 12</span></li>
+          <li><span class="ex">Plank</span><span class="sets">3 × 45s</span></li>
+        </ul>
+        <div class="footnote"><span>Friends don't skip leg day.</span><span class="tag">EARN THE WEEKEND</span></div>
+      </section>
+
+      <!-- SATURDAY -->
+      <section class="card">
+        <div class="corner">S</div>
+        <div class="day">
+          <div class="num">06</div>
+          <div class="name">FULL<small>SAT · CIRCUIT + 20 MIN STEADY</small></div>
+        </div>
+        <div class="focus">Circuit × 3 + Cardio</div>
+        <ul class="ex-list">
+          <li><span class="ex">Squats</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Push-ups</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Rows</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Shoulder Press</span><span class="sets">3 × 10</span></li>
+          <li><span class="ex">Steady Treadmill</span><span class="sets">20 MIN</span></li>
+        </ul>
+        <div class="footnote"><span>Move all of you.</span><span class="tag">FINISH THE WEEK</span></div>
+      </section>
+
+    </main>
+
+    <!-- COMMANDMENTS -->
+    <footer class="commandments">
+      <div class="creed">
+        EAT.<br/>LIFT.<br/><span class="red">SLEEP.</span><br/>REPEAT.
+      </div>
+      <div class="rules">
+        <span>PROTEIN AT EVERY MEAL · 30–50G</span>
+        <span>WATER 0.75–1 GAL / DAY</span>
+        <span>SLEEP 7–9 HRS · NON-NEGOTIABLE</span>
+        <span>LOG EVERY SET YOU LIFT</span>
+        <span>ADD WEIGHT OR REPS WEEKLY</span>
+        <span>SUNDAY IS REST. EARN IT.</span>
+      </div>
+      <div class="stamp-final">
+        DO<br/>WORK<small>EST. 2026</small>
+      </div>
+    </footer>
+
+    <!-- bottom hazard -->
+    <div class="bot-stripe hazard-thin"></div>
+  </div>
+</body>
+</html>
