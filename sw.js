@@ -11,7 +11,7 @@ const LOCAL_ASSETS = [
   '/app.jsx',
   '/manifest.json',
   '/icon.svg',
-  '/Prototypes/app/styles.css',
+  '/prototypes/app/styles.css',
 ];
 
 // CDN origins to cache at runtime (cache-first)
