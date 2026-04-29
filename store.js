@@ -28,17 +28,22 @@ window.IR_Store = (function(){
   }
 
   function getStartDate(uid) {
-    let s = read(uid, 'startDate', null);
-    if (!s) { s = todayISO(); write(uid, 'startDate', s); }
-    return s;
+    return read(uid, 'startDate', null);
+  }
+
+  function setStartDate(uid, date) {
+    write(uid, 'startDate', date);
   }
 
   function weekNumber(uid) {
-    const start = new Date(getStartDate(uid));
-    const now = new Date();
-    const days = Math.floor((now - start) / (1000*60*60*24));
+    const start = getStartDate(uid);
+    if (!start) return 1;
+    const days = Math.floor((new Date() - new Date(start)) / (1000*60*60*24));
     return Math.min(6, Math.max(1, Math.floor(days / 7) + 1));
   }
+
+  function getStartingStats(uid) { return read(uid, 'startingStats', {}); }
+  function setStartingStats(uid, data) { write(uid, 'startingStats', { ...getStartingStats(uid), ...data }); }
 
   function getWorkouts(uid) { return read(uid, 'workouts', {}); }
   function setWorkout(uid, date, data) {
@@ -130,7 +135,8 @@ window.IR_Store = (function(){
   }
 
   return {
-    todayISO, getStartDate, weekNumber,
+    todayISO, getStartDate, setStartDate, weekNumber,
+    getStartingStats, setStartingStats,
     getWorkouts, getWorkout, setWorkout,
     getCheckins, setCheckin,
     getMeasurements, setMeasurement,

@@ -15,9 +15,20 @@ function App() {
   function home() { go('home'); }
   function switchUser() { go('home'); }
 
-  // Auto-jump to Today when user is picked from home (only if a workout exists for today)
   function pickUser(uid) {
-    setView({ screen: 'today', uid });
+    const startDate = window.IR_Store.getStartDate(uid);
+    if (!startDate) {
+      setView({ screen: 'setup', uid });
+      return;
+    }
+    const weekNum = window.IR_Store.weekNumber(uid);
+    const checkins = window.IR_Store.getCheckins(uid);
+    const hasWeekly = !!(checkins[weekNum] && checkins[weekNum].weight != null);
+    if (!hasWeekly) {
+      setView({ screen: 'weekly-checkin', uid });
+    } else {
+      setView({ screen: 'today', uid });
+    }
   }
 
   let content;
@@ -39,8 +50,10 @@ function App() {
     case 'history':     content = <HistoryScreen user={user} onBack={home} onSwitchUser={switchUser} />; break;
     case 'nutrition':   content = <NutritionScreen user={user} onBack={home} onSwitchUser={switchUser} />; break;
     case 'compare':     content = <CompareScreen users={users} onBack={home} onSwitchUser={switchUser} />; break;
-    case 'photos':      content = <PhotosScreen user={user} onBack={home} onSwitchUser={switchUser} />; break;
-    default:            content = <HomeScreen users={users} currentUid={view.uid} onPickUser={pickUser} onMenu={(k)=>go(k)} />;
+    case 'photos':         content = <PhotosScreen user={user} onBack={home} onSwitchUser={switchUser} />; break;
+    case 'setup':          content = <SetupScreen user={user} onDone={() => go('today')} />; break;
+    case 'weekly-checkin': content = <WeeklyCheckinScreen user={user} weekNum={window.IR_Store.weekNumber(user.id)} onDone={() => go('today')} onSkip={() => go('today')} />; break;
+    default:               content = <HomeScreen users={users} currentUid={view.uid} onPickUser={pickUser} onMenu={(k)=>go(k)} />;
   }
 
   return (

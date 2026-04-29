@@ -38,7 +38,8 @@ function HomeScreen({ users, onPickUser, onMenu, currentUid }) {
         <div className="section-ttl" style={{gridColumn:'span 2'}}>WHO'S LIFTING <span className="badge">TAP TO PICK</span></div>
         {users.map(u => {
           const streak = window.IR_Store.getStreak(u.id);
-          const done = window.IR_Store.getWorkout(u.id, window.IR_Store.todayISO())?.completed;
+          const hasStarted = !!window.IR_Store.getStartDate(u.id);
+          const done = hasStarted && window.IR_Store.getWorkout(u.id, window.IR_Store.todayISO())?.completed;
           return (
             <div key={u.id}
                  className={"user-card" + (currentUid === u.id ? " active" : "")}
@@ -48,7 +49,7 @@ function HomeScreen({ users, onPickUser, onMenu, currentUid }) {
               <div className="stat-row">
                 <div className="stat"><div className="lab">HEIGHT</div><div className="val">{u.height}</div></div>
                 <div className="stat"><div className="lab">START</div><div className="val">{u.startWeight ? u.startWeight + ' LB' : '—'}</div></div>
-                <div className="stat"><div className="lab">TODAY</div><div className="val" style={{color: done ? 'var(--blood)' : 'var(--bone)'}}>{done ? 'DONE' : 'OPEN'}</div></div>
+                <div className="stat"><div className="lab">TODAY</div><div className="val" style={{color: !hasStarted ? 'var(--steel)' : done ? 'var(--blood)' : 'var(--bone)'}}>{!hasStarted ? 'SETUP' : done ? 'DONE' : 'OPEN'}</div></div>
               </div>
               <div className="streak">
                 <span className="num">{streak}</span>
@@ -580,8 +581,124 @@ function PhotosScreen({ user, onBack, onSwitchUser }) {
   );
 }
 
+// ─── SETUP (first-time per user) ──────────────────────
+function SetupScreen({ user, onDone }) {
+  const [startDate, setStartDateLocal] = uS(window.IR_Store.todayISO());
+  const [stats, setStats] = uS({});
+
+  const fields = [
+    ['weight', 'BODYWEIGHT (LBS)', 1],
+    ['bf',     'BODYFAT % (EST)',  0.5],
+    ['waist',  'WAIST (IN)',       0.25],
+    ['chest',  'CHEST (IN)',       0.25],
+    ['arms',   'ARMS (IN)',        0.25],
+    ['thighs', 'THIGHS (IN)',      0.25],
+  ];
+
+  function begin() {
+    window.IR_Store.setStartDate(user.id, startDate);
+    const hasStats = stats.weight || stats.waist || stats.bf || stats.chest || stats.arms || stats.thighs;
+    if (hasStats) {
+      window.IR_Store.setStartingStats(user.id, stats);
+      window.IR_Store.setMeasurement(user.id, startDate, stats);
+      window.IR_Store.setCheckin(user.id, 1, { weight: stats.weight, waist: stats.waist });
+    }
+    onDone();
+  }
+
+  return (
+    <div className="screen">
+      <div className="home-hero">
+        <div>
+          <div className="kicker">▌ {user.name.toUpperCase()} · PROGRAM SETUP</div>
+          <h1>SET <span className="red">/</span> YOUR<br/>START</h1>
+        </div>
+        <div className="stamp">DAY 01</div>
+      </div>
+      <div className="scroll">
+        <div className="section-ttl">START DATE <span className="badge">PICK YOUR DAY ONE</span></div>
+        <div className="card-shell" style={{display:'flex', alignItems:'center', gap:14, marginBottom:18}}>
+          <div style={{fontFamily:'Barlow Condensed', fontWeight:800, letterSpacing:'0.2em', fontSize:13, color:'var(--blood)', whiteSpace:'nowrap'}}>BEGIN ON</div>
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDateLocal(e.target.value)}
+            style={{background:'transparent', border:'none', borderBottom:'2px solid var(--blood)', color:'var(--bone)', fontFamily:'JetBrains Mono', fontSize:18, fontWeight:700, padding:'4px 8px', outline:'none', flex:1, colorScheme:'dark'}}
+          />
+        </div>
+
+        <div className="section-ttl">STARTING STATS <span className="badge">OPTIONAL — LOG NOW OR LATER</span></div>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:18}}>
+          {fields.map(([k, lab, step]) => (
+            <div key={k} className="card-shell" style={{display:'grid', gridTemplateColumns:'1fr auto', alignItems:'center', gap:12}}>
+              <div>
+                <div style={{fontFamily:'Barlow Condensed', fontWeight:800, letterSpacing:'0.2em', fontSize:11, color:'var(--blood)'}}>{lab}</div>
+                <div style={{fontFamily:'JetBrains Mono', fontSize:24, fontWeight:700, color:'var(--bone)'}}>{stats[k] ?? '—'}</div>
+              </div>
+              <NumStepper value={stats[k]} onChange={v => setStats(s => ({ ...s, [k]: v }))} step={step} />
+            </div>
+          ))}
+        </div>
+
+        <button className="btn lg" style={{width:'100%'}} onClick={begin}>
+          BEGIN PROGRAM — DAY ONE ✓
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── WEEKLY CHECK-IN (pre-workout, forced weekly) ─────
+function WeeklyCheckinScreen({ user, weekNum, onDone, onSkip }) {
+  const existing = window.IR_Store.getCheckins(user.id)[weekNum] || {};
+  const today = window.IR_Store.todayISO();
+  const existingMeas = window.IR_Store.getMeasurements(user.id)[today] || {};
+  const [data, setData] = uS({ ...existingMeas, ...existing });
+
+  function save() {
+    window.IR_Store.setCheckin(user.id, weekNum, { weight: data.weight, waist: data.waist });
+    if (data.weight || data.waist || data.bf) {
+      window.IR_Store.setMeasurement(user.id, today, { weight: data.weight, waist: data.waist, bf: data.bf });
+    }
+    onDone();
+  }
+
+  return (
+    <div className="screen">
+      <div className="home-hero">
+        <div>
+          <div className="kicker">▌ {user.name.toUpperCase()} · WEEK {weekNum}</div>
+          <h1>WEEK {weekNum} <span className="red">/</span><br/>CHECK-IN</h1>
+        </div>
+        <div className="stamp">LOG IT</div>
+      </div>
+      <div className="scroll">
+        <div className="section-ttl">WEEK {weekNum} STATS <span className="badge">LOG BEFORE YOU LIFT</span></div>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, marginBottom:18}}>
+          {[['weight','BODYWEIGHT (LBS)',1],['waist','WAIST (IN)',0.25],['bf','BODYFAT % (EST)',0.5]].map(([k,lab,step]) => (
+            <div key={k} className="card-shell" style={{display:'grid', gridTemplateColumns:'1fr auto', alignItems:'center', gap:12}}>
+              <div>
+                <div style={{fontFamily:'Barlow Condensed', fontWeight:800, letterSpacing:'0.2em', fontSize:11, color:'var(--blood)'}}>{lab}</div>
+                <div style={{fontFamily:'JetBrains Mono', fontSize:24, fontWeight:700, color:'var(--bone)'}}>{data[k] ?? '—'}</div>
+              </div>
+              <NumStepper value={data[k]} onChange={v => setData(d => ({ ...d, [k]: v }))} step={step} />
+            </div>
+          ))}
+        </div>
+        <button className="btn lg" style={{width:'100%', marginBottom:10}} onClick={save}>
+          LOG IT — TODAY'S WORKOUT ✓
+        </button>
+        <button className="btn" style={{width:'100%', background:'transparent', borderColor:'var(--steel)', color:'var(--steel)'}} onClick={onSkip}>
+          SKIP FOR NOW
+        </button>
+      </div>
+    </div>
+  );
+}
+
 Object.assign(window, {
   HomeScreen, TodayScreen, RestScreen, CheckinScreen,
   MeasurementsScreen, NutritionScreen, ProgressScreen,
   PRsScreen, HistoryScreen, CompareScreen, PhotosScreen,
+  SetupScreen, WeeklyCheckinScreen,
 });
